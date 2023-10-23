@@ -39,7 +39,7 @@
 # 安装依赖
 npm install
 # 或
-cnpm run dev
+cnpm install
 
 # 开发环境启动
 npm run dev
