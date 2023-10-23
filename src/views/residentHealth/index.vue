@@ -3,6 +3,7 @@
 import baseCheckboxGroup from "@/components/baseCheckboxGroup.vue";
 import baseCardPerson from "@/components/baseCardPerson.vue";
 import basePersonMessage from "@/components/basePersonMessage.vue";
+import baseTitle from "@/components/baseTitle.vue";
 //引入图标
 import {
   CirclePlus,
@@ -12,59 +13,16 @@ import {
   Printer,
   Document,
 } from "@element-plus/icons-vue";
+//引入vue3组件
 import { onMounted, ref } from "vue";
-const searchCode = ref(""); // 搜索框
-const attributeList = ref([
-  // 人员属性列表
-  { label: "一般人群", value: "1" },
-  { label: "高血压", value: "2" },
-  { label: "糖尿病", value: "3" },
-  { label: "精神障碍", value: "4" },
-  { label: "儿童", value: "5" },
-  { label: "老年人", value: "6" },
-]);
-const recordStatus = ref([
-  // 档案状态列表
-  { label: "正常", value: "1" },
-  { label: "注销", value: "2" },
-  { label: "死亡", value: "3" },
-  { label: "迁出", value: "4" },
-  { label: "其他", value: "5" },
-]); // 档案状态
-interface Card {
-  name: string;
-  sex: string;
-  age: string;
-  personType: string;
-  idCard: string;
-  localHome: string;
-  selected: boolean;
-}
-const cardPersonList = ref<Card[]>([
-  //人员列表
-  {
-    name: "马拉多纳",
-    sex: "男",
-    age: "64",
-    personType: "高",
-    idCard: "77886657584",
-    localHome: "高新街道创新时代",
-    selected: false,
-  },
-  // {
-  //   name:'罗纳尔多',
-  //   sex:'男',
-  //   age:'64',
-  //   personType:'高',
-  //   idCard:'77886657584',
-  //   localHome:'高新街道创新时代',
-  //   selected: false,
-  // }
-]);
-const clickPerson = (item: Card) => {
-  // 点击人员列表
-  console.log(item);
-};
+//引入接口方法
+import {
+  getResidentHealth,
+  ResponseData,
+  getSearch,
+  getRecord,
+} from "@/api/residentHealth";
+//树start
 interface Tree {
   //定义树的数据类型
   label: string;
@@ -117,22 +75,61 @@ const defaultProps = {
   children: "children",
   label: "label",
 };
+//树end
 
-//引入人员属性查询接口和返回数据api
-import {
-  getResidentHealth,
-  ResponseData,
-  getSearch,
-  getRecord,
-} from "@/api/residentHealth";
-//获取人员属性列表数据
-const getAttributeList = async () => {
-  const res = await getResidentHealth("RYSX");
-};
-//获取档案状态列表数据
-const getRecordStatusList = async () => {
-  const res = await getResidentHealth("DAZT");
-};
+const searchCode = ref(""); // 搜索框
+// 人员属性列表
+const attributeList = ref([
+  { label: "一般人群", value: "1" },
+  { label: "高血压", value: "2" },
+  { label: "糖尿病", value: "3" },
+  { label: "精神障碍", value: "4" },
+  { label: "儿童", value: "5" },
+  { label: "老年人", value: "6" },
+]);
+// 档案状态列表
+const recordStatus = ref([
+  { label: "正常", value: "1" },
+  { label: "注销", value: "2" },
+  { label: "死亡", value: "3" },
+  { label: "迁出", value: "4" },
+  { label: "其他", value: "5" },
+]); 
+//人员列表
+const cardPersonList = ref([
+  {
+    name: "马拉多纳",
+    sex: "男",
+    age: "64",
+    personType: "高",
+    idCard: "77886657584",
+    localHome: "高新街道创新时代",
+    selected: false,
+    bigGanglion:'1',
+    brucella:'1',
+    child:'1',
+    coronary:'1',
+    deformed:'1',
+    dentalFluorosis:'1',
+    echinococcosis:'1',
+    familyDoctor:'1',
+    hypertension:'1',
+    mental:'1',
+  },
+  {
+    name:'罗纳尔多',
+    sex:'男',
+    age:'64',
+    personType:'风',
+    idCard:'338855866',
+    localHome:'高新街道创新时代',
+    selected: false,
+    dentalFluorosis:'1',
+    echinococcosis:'1',
+    familyDoctor:'1',
+    hypertension:'1'
+  }
+]);
 //定义查询对象
 const queryData = ref({
   key: "",
@@ -141,6 +138,24 @@ const queryData = ref({
   current: 1,
   size: 10,
 });
+const checkAttribute = ref([]); //定义选中的人员属性
+const checkStatus = ref([]);  //定义选中的档案状态
+const showTooltip = ref(false); //定义鼠标移入移出事件
+const formData = ref({})
+onMounted(() => {
+  getAttributeList()
+  // getRecordStatusList()
+  // getSearchList(queryData.value)
+  // getRecordList('3d22b82551d397d4d1692c429369c955')
+});
+//获取人员属性列表数据
+const getAttributeList = async () => {
+  const res = await getResidentHealth("RYSX");
+};
+//获取档案状态列表数据
+const getRecordStatusList = async () => {
+  const res = await getResidentHealth("DAZT");
+};
 //获取查询列表数据
 const getSearchList = async (queryData: {
   current: number;
@@ -162,18 +177,17 @@ const getSearchList = async (queryData: {
 const getRecordList = async (hrGid: string) => {
   const res = await getRecord(hrGid);
 };
-onMounted(() => {
-  // getAttributeList()
-  // getRecordStatusList()
-  // getSearchList(queryData.value)
-  // getRecordList('3d22b82551d397d4d1692c429369c955')
-});
+// 点击人员列表
+const clickPerson = (item:any) => {
+  console.log(item);
+};
+//点击查询框
 const clickSearch = () => {
   console.log(searchCode.value);
+  console.log(checkAttribute.value);
+  console.log(checkStatus.value);
+  
 };
-const checkAttribute = ref([]);
-const checkStatus = ref([]);
-const showTooltip = ref(false);
 </script>
 <template>
   <div class="health_content">
@@ -202,7 +216,7 @@ const showTooltip = ref(false);
         </div>
         <div class="search_button">
           <div class="button_person">
-            <div class="person_text">人员属性</div>
+            <baseTitle title="人员属性" :showLine="false"/>
             <div class="person_list">
               <baseCheckboxGroup
                 :checkList="attributeList"
@@ -211,7 +225,7 @@ const showTooltip = ref(false);
             </div>
           </div>
           <div class="button_record">
-            <div class="person_text">档案状态</div>
+            <baseTitle title="档案状态" :showLine="false"/>
             <div class="record_status">
               <baseCheckboxGroup
                 :checkList="recordStatus"
@@ -221,7 +235,7 @@ const showTooltip = ref(false);
             </div>
           </div>
           <div class="local_area">
-            <div class="person_text">归属地区</div>
+            <baseTitle title="归属地区" :showLine="false"/>
             <div class="area_list">
               <el-tree
                 :data="data"
@@ -231,7 +245,7 @@ const showTooltip = ref(false);
             </div>
           </div>
           <div class="family_record">
-            <div class="person_text">家庭档案</div>
+            <baseTitle title="家庭档案" :showLine="false"/>
             <div class="record_message">
               <div class="message_number">
                 <p><i>户主档案管理单位</i>XXXXXXXXXXX3335</p>
@@ -278,8 +292,8 @@ const showTooltip = ref(false);
           <p>档案管理</p>
           <div class="title_status">正常</div>
         </div>
-        <el-scrollbar height="700px">
-          <base-person-message />
+        <el-scrollbar height="831px" v-if="!formData">
+          <base-person-message :formData="formData"/>
         </el-scrollbar>
       </div>
     </div>
@@ -288,100 +302,91 @@ const showTooltip = ref(false);
 
 <style scoped lang="scss">
 .health_content {
-  padding: 0 40px;
+  width: 1639px;
+  height: 881px;
 
   .content_header {
-    height: 50px;
+    width: 1639px;
+    height: 64px;
+    background: #FFFFFF;
+    box-shadow: 0px 1px 21px 0px rgba(38,46,45,0.06);
+    border-radius: 10px 10px 0px 0px;
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    padding: 10px 20px;
-    background: #ffffff;
-    border-radius: 8px;
     margin-bottom: 20px;
     .el-button {
-      margin-left: 20px;
+      margin-right: 20px;
       width: 100px;
       height: 36px;
     }
   }
   .content_body {
+    width: 1639px;
+    height: 881px;
     display: flex;
     justify-content: space-between;
-    height: 780px;
-    width: 100%;
     align-items: center;
-    .person_text {
-      height: 20px;
-      width: 100%;
-      border-left: 5px solid #377cf7;
-      font-size: 16px;
-      font-weight: 500;
-      padding-left: 10px;
+    .base_title {
+      margin-left: -5px;
     }
     .body_search {
+      width: 329px;
+      height: 881px;
+      background: #FFFFFF;
+      box-shadow: 0px 2px 8px 0px rgba(0,0,0,0.06);
+      border-radius: 10px;
       display: flex;
-      height: 100%;
-      width: 370px;
       flex-direction: column;
       align-items: center;
-      border-radius: 10px;
-      padding-top: 10px;
-      background: #ffffff;
       .search_input {
+        width: 300px;
         height: 37px;
+        margin-bottom: 18px;
+        margin-top: 15px;
       }
       .search_button {
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        height: 713px;
-        width: 310px;
+        .base_title {
+            width: 300px;
+            height: 24px;
+          }
         .button_person {
           display: flex;
           flex-direction: column;
-          height: 120px;
-          width: 100%;
+          width: 300px;
+          height: 157.99px;
+          margin-bottom: 21px;
           .person_list {
-            width: 310px;
-            height: 100px;
-            margin-top: 10px;
-            .el-checkbox {
-              margin-right: 5%;
-              margin-bottom: 5px;
-            }
-            :deep(.el-checkbox__inner) {
-              display: none;
-            }
+            width: 299px;
+            height: 117.23px;
+            margin-top: 17px;
           }
         }
         .button_record {
           display: flex;
           flex-direction: column;
-          height: 120px;
-          width: 100%;
+          width: 300px;
+          height: 113.99px;
+          margin-bottom: 20px;
           .record_status {
-            width: 310px;
-            height: 100px;
-            margin-top: 10px;
-            .el-checkbox {
-              margin-right: 5%;
-              margin-bottom: 5px;
-            }
-            :deep(.el-checkbox__inner) {
-              display: none;
-            }
+            width: 299px;
+            height: 74.62px;
+            margin-top: 17px;
           }
         }
         .local_area {
           display: flex;
           flex-direction: column;
-          height: 220px;
-          width: 100%;
+          height: 240px;
+          width: 300px;
+          margin-bottom: 12px;
           .area_list {
-            width: 310px;
-            height: 100%;
-            margin-top: 10px;
+            width: 300px;
+            height: 200px;
+            margin-top: 17px;
             :deep(.el-tree-node__content) {
               height: 26px;
             }
@@ -407,31 +412,35 @@ const showTooltip = ref(false);
         .family_record {
           display: flex;
           flex-direction: column;
-          height: 220px;
-          width: 100%;
+          height: 244px;
+          width: 300px;
           .record_message {
             display: flex;
             flex-direction: column;
-
-            width: 310px;
-            height: 100%;
-            margin-top: 10px;
+            width: 300px;
+            height: 208px;
+            margin-top: 12px;
             .message_number {
-              height: 94px;
-              margin-bottom: 10px;
+              width: 272px;
               p {
-                font-size: 12px;
-                color: #414f64;
+                white-space: nowrap;
+                width: 272px;
+                height: 24px;
+                margin: 11px 0 0 11px;
+                color: rgba(102, 102, 102, 1);
+                font-size: 14px;
+                font-family: SourceHanSansCN-Regular;
               }
               i {
-                font-size: 13px;
-                font-weight: 600;
-                color: #377cf7;
+                color: rgba(47, 122, 255, 1);
+                font-size: 14px;
+                font-family: SourceHanSansCN-Regular;
                 margin-right: 20px;
               }
             }
             .relation {
-              height: 40px;
+              width: 282px;
+              height: 104px;
               background: #e4e7ed;
               padding: 2px 2px;
               border-radius: 8px;
@@ -448,17 +457,18 @@ const showTooltip = ref(false);
                   font-size: 16px;
                   font-family: SourceHanSansCN-Bold, SourceHanSansCN;
                   font-weight: bold;
-                  color: #414f64;
+                  color: #414F64;
                 }
                 .relate_person {
-                  width: 140px;
+                  width: 147px;
                   height: 22px;
-                  background: #e8eaf0;
+                  background: #E8EAF0;
+                  border-radius: 4px;
+                  opacity: 0.5;
                   font-size: 14px;
                   font-family: SourceHanSansCN-Medium, SourceHanSansCN;
                   font-weight: 500;
-                  color: #414f64;
-                  border-radius: 8px;
+                  color: #414F64;
                   text-align: center;
                 }
               }
@@ -468,49 +478,52 @@ const showTooltip = ref(false);
       }
     }
     .body_table {
+      width: 340px;
+      height: 881px;
+      background: #FFFFFF;
+      box-shadow: 0px 13px 27px 0px rgba(217,223,234,0.5);
+      border-radius: 10px;
       display: flex;
       flex-direction: column;
-      height: 100%;
-      width: 370px;
       justify-content: space-between;
       align-items: center;
-      background: #ffffff;
-      border-radius: 10px;
-      padding-top: 10px;
+      margin-left: 10px;
       .table_result {
         display: flex;
-        justify-content: space-between;
+        justify-content: space-around;
+        width: 333px;
         height: 50px;
-        width: 350px;
         font-size: 14px;
-        font-weight: 500;
         font-family: SourceHanSansCN-Medium, SourceHanSansCN;
-        color: #414f64;
+        font-weight: 500;
+        color: #414F64;
         border-bottom: 1px dashed #414f64;
       }
       .table_card {
         display: flex;
         flex-direction: column;
-        height: 630px;
-        width: 350px;
+        width: 340px;
+        height: 750px;
       }
       .table_page {
         display: flex;
         justify-content: center;
-        height: 50px;
-        width: 370px;
+        width: 340px;
+        height: 38px;
+        background: #EEF8FF;
+        border: 1px solid #E8EAF0;
         font-size: 16px;
         font-family: SourceHanSansCN-Medium, SourceHanSansCN;
         font-weight: 500;
-        color: #ffffff;
+        color: #2F7AFF;
+        border-radius: 0px 0px 10px 10px;
         .page_up,
         .page_down {
-          height: 100%;
-          width: 185px;
-          background: #eef8ff;
+          width: 170px;
+          height: 38px;
+          border: 1px solid #E8EAF0;
           text-align: center;
-          line-height: 50px;
-          color: #2f7aff;
+          line-height: 38px;
         }
         .page_up {
           border-bottom-left-radius: 10px;
@@ -518,6 +531,7 @@ const showTooltip = ref(false);
         .page_down {
           border-bottom-right-radius: 10px;
         }
+
         .page_up:hover {
           background: #2f7aff;
           cursor: pointer;
@@ -529,37 +543,38 @@ const showTooltip = ref(false);
           cursor: pointer;
           border-bottom-right-radius: 10px;
           color: #ffffff;
-        }
+        } 
       }
     }
     .body_content {
+      width: 950px;
+      height: 881px;
+      background: #FFFFFF;
+      box-shadow: 0px 13px 27px 0px rgba(217,223,234,0.5);
+      border-radius: 10px;
       display: flex;
       flex-direction: column;
-      height: 100%;
-      width: 840px;
-      border-radius: 10px;
-      padding-top: 10px;
-      background: #ffffff;
+      margin-left: 10px;
       .content_title {
         display: flex;
         justify-content: flex-start;
         align-items: center;
-        height: 40px;
-        width: 100%;
+        width: 953px;
+        height: 50px;
         .image {
           width: 21px;
           height: 16px;
           background-image: url("@/assets/record_manage.png");
           background-repeat: no-repeat;
           background-size: 100% 100%;
-          margin-left: 15px;
+          margin-left: 12px;
         }
         p {
           font-size: 16px;
           font-family: SourceHanSansCN-Bold, SourceHanSansCN;
           font-weight: bold;
-          color: #414f64;
-          margin-left: 5px;
+          color: #414F64;
+          margin-left: 2px;
         }
         .title_status {
           width: 50px;
@@ -571,7 +586,7 @@ const showTooltip = ref(false);
           font-family: SourceHanSansCN-Regular, SourceHanSansCN;
           font-weight: 400;
           color: #0cac0b;
-          margin-left: 20px;
+          margin-left: 19px;
           text-align: center;
         }
       }

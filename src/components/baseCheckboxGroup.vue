@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import {  defineEmits } from "vue";
 interface CheckListItem { 
   label: string;
   value: string;
@@ -44,8 +43,26 @@ const change = (val: string[]) => {
 .el-checkbox {
   margin-right: 5%;
   margin-bottom: 5px;
+  height: 32px;
+  background: #E8EAF0;
+  border-radius: 4px;
+  opacity: 0.5;
+  font-size: 16px;
+  font-family: SourceHanSansCN-Regular, SourceHanSansCN;
+  font-weight: 400;
+  color: #717C8C;
+}
+.is-bordered.is-checked  {
+  height: 32px;
+  background: #2F7AFF;
+  box-shadow: 0px 3px 5px 0px rgba(54,122,245,0.25);
+  border-radius: 4px;
+  :deep(.el-checkbox__label) {
+    color: #FFFFFF;
+  }
 }
 :deep(.el-checkbox__inner) {
   display: none;
 }
+
 </style>

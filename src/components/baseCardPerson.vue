@@ -1,28 +1,27 @@
 <script setup lang="ts">
-import { defineEmits, ref } from "vue";
-//定义接收过来的cardList的数据类型
-interface Card {
-  name: string;
-  sex: string;
-  age: string;
-  personType: string;
-  idCard: string;
-  localHome: string;
-  selected: boolean;
-}
+import { computed,  onMounted, ref } from "vue";
+//导入筛选方法
+import {filterTypeList} from '@/utils/filterType'
+
 const props = defineProps({
   cardList: {
-    type: Array as () => Card[],
-    required: true,
+    type: Array as () => Array<any>,
+    default: () => [],
   },
   showTooltip: {
     type: Boolean,
     default: false,
   },
 });
+//定义发射出去的数据类型
 const emits = defineEmits(["click", "update:showTooltip"]);
-const selectedCard = ref<Card | null>(null);
-const click = (item: Card) => {
+//定义选中的card
+const selectedCard = ref<null>(null);
+onMounted(() => {
+  // console.log(filterTypeList(props.cardList[0]));
+});
+//定义选中的card
+const click = (item:any) => {
   props.cardList.forEach((card) => {
     if (card !== item) {
       card.selected = false;
@@ -32,12 +31,18 @@ const click = (item: Card) => {
   selectedCard.value = item;
   emits("click", item);
 };
-const handleMouseOver = () => {
+const showTooltip = ref<{ [key: string]: boolean }>({}); //定义鼠标移入移出事件
+//定义鼠标移入移出事件
+const handleMouseOver = (item:any) => {
+  showTooltip.value[item.idCard] = true;
   emits("update:showTooltip", true);
 };
-const handleMouseLeave = () => {
+//定义鼠标移入移出事件
+const handleMouseLeave = (item:any) => {
+  showTooltip.value[item.idCard] = false;
   emits("update:showTooltip", false);
 };
+
 </script>
 <template>
   <div
@@ -47,7 +52,7 @@ const handleMouseLeave = () => {
     @click="click(item)"
     :class="{ selected: item === selectedCard }"
   >
-    <div class="card_line"></div>
+    <div class="card_line"  :class="{ visibleLine: item === selectedCard }" ></div>
     <div class="person_name">
       <h1>{{ item.name }}</h1>
       <p>{{ item.sex }} &nbsp;&nbsp;{{ item.age }}岁</p>
@@ -55,26 +60,12 @@ const handleMouseLeave = () => {
     <div class="person_id">
       <div
         class="person_type"
-        @mouseover="handleMouseOver"
-        @mouseleave="handleMouseLeave"
+        @mouseover="handleMouseOver(item)"
+        @mouseleave="handleMouseLeave(item)"
       >
-        <i>{{ item.personType }}</i>
-        <i>{{ item.personType }}</i>
-        <i>{{ item.personType }}</i>
-        <i>{{ item.personType }}</i>
-        <i>{{ item.personType }}</i>
-        <i>{{ item.personType }}</i>
-        <i>{{ item.personType }}</i>
-        <i>{{ item.personType }}</i>
-        <div class="tooltip"  v-if="showTooltip" >
-        <i>{{ item.personType }}</i>
-        <i>{{ item.personType }}</i>
-        <i>{{ item.personType }}</i>
-        <i>{{ item.personType }}</i>
-        <i>{{ item.personType }}</i>
-        <i>{{ item.personType }}</i>
-        <i>{{ item.personType }}</i>
-        <i>{{ item.personType }}</i>
+        <i v-for="(type,index) in filterTypeList(item)" :key="index" :style="{ borderColor: type.color, color: type.color }" >{{ type.text }}</i>
+        <div class="tooltip"  v-if="showTooltip[item.idCard] && filterTypeList(item).length > 7" >
+        <i v-for="(type,index) in filterTypeList(item)" :key="index" :style="{ borderColor: type.color, color: type.color }" >{{ type.text }}</i>
       </div>
       </div>
       <div class="home_id">
@@ -92,8 +83,13 @@ const handleMouseLeave = () => {
 </template>
 
 <style scoped lang="scss">
+.visibleLine {
+  visibility: inherit !important;
+}
 .selected {
-  background-color: #f0f0f0;
+  background-color: #fff;
+  box-shadow: 0px 0px 6px 0px rgba(0, 0, 0, 0.1);
+  border: 1px solid #8eb7ff;
 }
 .card_person {
   display: flex;
@@ -103,20 +99,19 @@ const handleMouseLeave = () => {
   margin-bottom: 5px;
   box-shadow: 0px 0px 6px 0px rgba(0, 0, 0, 0.1);
   border-radius: 4px;
-  border: 1px solid #8eb7ff;
   cursor: pointer;
   position: relative;
   .card_line {
-    width: 20px;
+    width: 10px;
     height: 100%;
     background-image: url("@/assets/card_line.png");
     background-repeat: no-repeat;
     background-size: 100% 100%;
+    visibility: hidden;
   }
   .person_name {
     width: 100px;
     height: 60px;
-    /* background: #414F64; */
     text-align: center;
     line-height: 10px;
     border-right: 1px solid #dbe2ef;

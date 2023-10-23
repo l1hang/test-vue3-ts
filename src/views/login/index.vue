@@ -6,7 +6,7 @@ import { login } from '@/api/Login'
 import { tokenStore,accountStore } from '@/store/modules/user'
 import { loginReq } from '@/api/types/loginReq'
 import type { FormInstance } from 'element-plus'
-import { encode,decode  } from 'js-base64';
+// import { encode,decode  } from 'js-base64';
  
 onMounted(()=>{
     

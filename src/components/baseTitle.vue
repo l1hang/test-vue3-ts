@@ -40,13 +40,10 @@ const props = defineProps({
   font-size: 16px;
   font-family: SourceHanSansCN-Medium, SourceHanSansCN;
   font-weight: 500;
-  color: #414f64;
+  color: #414F64;
   margin-left: 20px;
   .title_icon {
-    /* width: 4px;
-    height: 14px; */
     background: #377cf7;
-    /* border-radius: 1px; */
     margin-right: 10px;
     margin-top: 2px;
   }
