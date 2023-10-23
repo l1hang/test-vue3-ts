@@ -303,7 +303,7 @@ const clickSearch = () => {
 <style scoped lang="scss">
 .health_content {
   width: 1639px;
-  height: 881px;
+  height: 955px;
 
   .content_header {
     width: 1639px;

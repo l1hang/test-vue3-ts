@@ -1,12 +1,7 @@
 <script setup lang="ts">
-
 import { reactive, ref,onMounted } from 'vue'
 import router from '@/router/index'
-import { login } from '@/api/Login'
-import { tokenStore,accountStore } from '@/store/modules/user'
-import { loginReq } from '@/api/types/loginReq'
 import type { FormInstance } from 'element-plus'
-// import { encode,decode  } from 'js-base64';
  
 onMounted(()=>{
     
@@ -14,16 +9,11 @@ onMounted(()=>{
 //from表单校验
 const ruleFormRef = ref<FormInstance>()
 // 这里存放数据
-const user = reactive < loginReq > ({
+const user = reactive ({
   account: '',
   password: '',
   verifyCode:''
 })
-const users = reactive < loginReq > ({
-    account: '',
-    password: '',
-    verifyCode:''
-  })
 //校验
 const validatePassword = (rule: any, value: any, callback: any) => {
     if (value === '') {

@@ -1,5 +1,5 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
-import { requireAuth } from './auth'
+import { requireAuth } from "./auth";
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
@@ -8,13 +8,35 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/home",
     name: "home",
-    component: () => import("@/views/residentHealth/index.vue"),
-    // beforeEnter: requireAuth
+    component: () => import("@/layouts/layout/index.vue"),
+    // beforeEnter: requireAuth,
+    children: [
+      {
+        path: "/residentHealth",
+        name: "residentHealth",
+        component: () => import("@/views/residentHealth/index.vue"),
+      },
+      {
+        path: "/recordLocation",
+        name: "recordLocation",
+        component: () => import("@/views/recordLocation/index.vue"),
+      },
+      {
+        path: "/recordTotal",
+        name: "recordTotal",
+        component: () => import("@/views/recordTotal/index.vue"),
+      },
+    ],
   },
   {
     path: "/login",
     name: "login",
     component: () => import("@/views/login/index.vue"),
+  },
+  {
+    path: "/error",
+    name: "error",
+    component: () => import("@/views/error/index.vue"),
   },
 ];
 const router = createRouter({

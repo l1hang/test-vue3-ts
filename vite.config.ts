@@ -1,35 +1,4 @@
 
-// https://vitejs.dev/config/
-// export default defineConfig({
-//   plugins: [
-//     vue(),
-//     Components({
-//       resolvers: [ElementPlusResolver()],
-//     }),
-//     {
-//       name: 'sass',
-//       renderChunk: (code) => {
-//         const { css } = sass.renderSync({ data: code })
-//         return { code: css.toString() }
-//       },
-//     },
-//   ],
-//   resolve: {
-//     alias: {
-//       '@': path.resolve(__dirname, 'src'),
-//       '@components': path.resolve(__dirname, 'src/components'),
-//   },
-//   },
-//   server: {
-//     proxy: {
-//       '/api': {
-//         target: 'http://172.16.30.19:9080',
-//         changeOrigin: true,
-//         rewrite: (path) => path.replace(/^\/api/, ''),
-//       },
-//     },
-//   },
-// })
 import { defineConfig ,loadEnv } from 'vite'  //lodEnv 用于加载环境变量
 import vue from '@vitejs/plugin-vue'
 
