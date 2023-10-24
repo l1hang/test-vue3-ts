@@ -100,6 +100,7 @@ const formData = ref({
 })
 const searchTotal = ref(0)
 const currentSize = ref(0)
+const isDataLoaded = ref(false)
 onMounted(() => {
   getAttributeList()
   getRecordStatusList()
@@ -161,9 +162,10 @@ const getRecordList = async (hrGid: string) => {
 };
 // 点击人员列表
 const clickPerson =  async (item:any) => {
+  isDataLoaded.value = true;
   formData.value = {
   recordState:'1'
-}
+  }
   await getRecordList(item.hrGid)
 };
 //点击查询框
@@ -300,6 +302,7 @@ const chickDown = async() => {
           <div class="title_status" v-if="Object.keys(formData).length > 1">{{  filterStatus(formData.recordState)}}</div>
         </div>
         <el-scrollbar height="831px" >
+          <div v-if="!isDataLoaded" class="no-data"></div>
           <base-person-message :formData="formData" v-if="Object.keys(formData).length > 1"/>
         </el-scrollbar>
       </div>
@@ -569,6 +572,14 @@ const chickDown = async() => {
       display: flex;
       flex-direction: column;
       margin-left: 10px;
+      .no-data {
+        width: 100%;
+        height: 820px;
+        background-image: url('@/assets/empty_data.png');
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 10% 15%;
+      }
       .content_title {
         display: flex;
         justify-content: flex-start;
