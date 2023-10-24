@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed,  onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 //导入筛选方法
-import {filterTypeList} from '@/utils/filterType'
-
+import { filterAttribute ,getSex } from "@/utils/filter/filterMore";
+import { getAge } from "@/utils/translate/index";
 const props = defineProps({
   cardList: {
     type: Array as () => Array<any>,
@@ -18,10 +18,10 @@ const emits = defineEmits(["click", "update:showTooltip"]);
 //定义选中的card
 const selectedCard = ref<null>(null);
 onMounted(() => {
-  // console.log(filterTypeList(props.cardList[0]));
+
 });
 //定义选中的card
-const click = (item:any) => {
+const click = (item: any) => {
   props.cardList.forEach((card) => {
     if (card !== item) {
       card.selected = false;
@@ -33,29 +33,31 @@ const click = (item:any) => {
 };
 const showTooltip = ref<{ [key: string]: boolean }>({}); //定义鼠标移入移出事件
 //定义鼠标移入移出事件
-const handleMouseOver = (item:any) => {
-  showTooltip.value[item.idCard] = true;
+const handleMouseOver = (item: any) => {
+  showTooltip.value[item.hrGid] = true;
   emits("update:showTooltip", true);
 };
 //定义鼠标移入移出事件
-const handleMouseLeave = (item:any) => {
-  showTooltip.value[item.idCard] = false;
+const handleMouseLeave = (item: any) => {
+  showTooltip.value[item.hrGid] = false;
   emits("update:showTooltip", false);
 };
-
 </script>
 <template>
   <div
     class="card_person"
     v-for="item in props.cardList"
-    :key="item.idCard"
+    :key="item.hrGid"
     @click="click(item)"
     :class="{ selected: item === selectedCard }"
   >
-    <div class="card_line"  :class="{ visibleLine: item === selectedCard }" ></div>
+    <div
+      class="card_line"
+      :class="{ visibleLine: item === selectedCard }"
+    ></div>
     <div class="person_name">
       <h1>{{ item.name }}</h1>
-      <p>{{ item.sex }} &nbsp;&nbsp;{{ item.age }}岁</p>
+      <p>{{ getSex(item.sex) }} &nbsp;&nbsp;{{ getAge(item.birthday) }}岁</p>
     </div>
     <div class="person_id">
       <div
@@ -63,19 +65,32 @@ const handleMouseLeave = (item:any) => {
         @mouseover="handleMouseOver(item)"
         @mouseleave="handleMouseLeave(item)"
       >
-        <i v-for="(type,index) in filterTypeList(item)" :key="index" :style="{ borderColor: type.color, color: type.color }" >{{ type.text }}</i>
-        <div class="tooltip"  v-if="showTooltip[item.idCard] && filterTypeList(item).length > 7" >
-        <i v-for="(type,index) in filterTypeList(item)" :key="index" :style="{ borderColor: type.color, color: type.color }" >{{ type.text }}</i>
-      </div>
+        <i
+          v-for="(type, index) in filterAttribute(item.personAttributes)"
+          :key="index"
+          :style="{ borderColor: type.color, color: type.color }"
+          >{{ type.text }}</i
+        >
+        <div
+          class="tooltip"
+          v-if="showTooltip[item.hrGid] && filterAttribute(item.personAttributes).length > 7"
+        >
+          <i
+            v-for="(type, index) in filterAttribute(item.personAttributes)"
+            :key="index"
+            :style="{ borderColor: type.color, color: type.color }"
+            >{{ type.text }}</i
+          >
+        </div>
       </div>
       <div class="home_id">
         <div class="id_card">
           <div class="card_img"></div>
-          <p>{{ item.idCard }}</p>
+          <p>{{ item.idcNo }}</p>
         </div>
         <div class="local_home">
           <div class="home_img"></div>
-          <p>{{ item.localHome }}</p>
+          <p>{{ item.presentjdAddressName }}{{  item.presentjdAddressCode}}</p>
         </div>
       </div>
     </div>
@@ -211,3 +226,4 @@ const handleMouseLeave = (item:any) => {
   }
 }
 </style>
+@/utils/translate/index

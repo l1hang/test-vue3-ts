@@ -7,6 +7,7 @@ const props = defineProps({
   modelValue: {
     type: Array,
     default: () => [],
+    readonly: false, 
   },
   checkList: {
     type: Array as () => CheckListItem[],

@@ -22,6 +22,7 @@ import {
   getSearch,
   getRecord,
 } from "@/api/residentHealth";
+import {filterStatus} from "@/utils/filter/filterMore"
 //树start
 interface Tree {
   //定义树的数据类型
@@ -77,64 +78,17 @@ const defaultProps = {
 };
 //树end
 
-const searchCode = ref(""); // 搜索框
 // 人员属性列表
-const attributeList = ref([
-  { label: "一般人群", value: "1" },
-  { label: "高血压", value: "2" },
-  { label: "糖尿病", value: "3" },
-  { label: "精神障碍", value: "4" },
-  { label: "儿童", value: "5" },
-  { label: "老年人", value: "6" },
-]);
+const attributeList = ref([]);
 // 档案状态列表
-const recordStatus = ref([
-  { label: "正常", value: "1" },
-  { label: "注销", value: "2" },
-  { label: "死亡", value: "3" },
-  { label: "迁出", value: "4" },
-  { label: "其他", value: "5" },
-]); 
+const recordStatus = ref([]); 
 //人员列表
-const cardPersonList = ref([
-  {
-    name: "马拉多纳",
-    sex: "男",
-    age: "64",
-    personType: "高",
-    idCard: "77886657584",
-    localHome: "高新街道创新时代",
-    selected: false,
-    bigGanglion:'1',
-    brucella:'1',
-    child:'1',
-    coronary:'1',
-    deformed:'1',
-    dentalFluorosis:'1',
-    echinococcosis:'1',
-    familyDoctor:'1',
-    hypertension:'1',
-    mental:'1',
-  },
-  {
-    name:'罗纳尔多',
-    sex:'男',
-    age:'64',
-    personType:'风',
-    idCard:'338855866',
-    localHome:'高新街道创新时代',
-    selected: false,
-    dentalFluorosis:'1',
-    echinococcosis:'1',
-    familyDoctor:'1',
-    hypertension:'1'
-  }
-]);
+const cardPersonList = ref([]);
 //定义查询对象
 const queryData = ref({
   key: "",
   personAttributes: "",
-  recordState: "1",
+  recordState: "",
   current: 1,
   size: 10,
 });
@@ -142,52 +96,100 @@ const checkAttribute = ref([]); //定义选中的人员属性
 const checkStatus = ref([]);  //定义选中的档案状态
 const showTooltip = ref(false); //定义鼠标移入移出事件
 const formData = ref({})
+const searchTotal = ref(0)
+const currentSize = ref(0)
 onMounted(() => {
   getAttributeList()
-  // getRecordStatusList()
-  // getSearchList(queryData.value)
-  // getRecordList('3d22b82551d397d4d1692c429369c955')
+  getRecordStatusList()
+  getSearchList(queryData.value)
 });
 //获取人员属性列表数据
 const getAttributeList = async () => {
-  const res = await getResidentHealth("RYSX");
+  try {
+    const res = await getResidentHealth("RYSX");
+    const {data} = res as ResponseData
+  attributeList.value = data.map((item:any) => {
+    return {
+      label: item.dictName,
+      value: item.dictValue
+    }
+  })
+  } catch (error) {
+    console.log(error);
+  }
 };
 //获取档案状态列表数据
 const getRecordStatusList = async () => {
-  const res = await getResidentHealth("DAZT");
+  try{
+    const res = await getResidentHealth("DAZT");
+    const {data} = res as ResponseData
+    recordStatus.value = data.map((item:any) => {
+      return {
+        label: item.dictName,
+        value: item.dictValue
+      }
+    })
+  }catch(error) {
+    console.log(error);
+  }
 };
 //获取查询列表数据
-const getSearchList = async (queryData: {
-  current: number;
-  size: number;
-  key: string;
-  personAttributes: string;
-  recordState: string;
-}) => {
-  const { current, size, key, personAttributes, recordState } = queryData;
-  const res = await getSearch(
-    current,
-    size,
-    key,
-    personAttributes,
-    recordState
-  );
+const getSearchList = async (queryData:any) => {
+  try {
+    const { current, size, key, personAttributes, recordState } = queryData;
+    const res = await getSearch(current, size, key, personAttributes, recordState);
+    const {data } = res as ResponseData
+    searchTotal.value = data.total
+    currentSize.value = data.size
+    cardPersonList.value = data.records
+    // 处理响应数据
+  } catch (error) {
+    console.log(error);
+  }
 };
 //获取人员档案信息
 const getRecordList = async (hrGid: string) => {
-  const res = await getRecord(hrGid);
+  try{
+    const res = await getRecord(hrGid);
+    const {data} = res as ResponseData
+    formData.value = data
+  }catch(error) {
+    console.log(error);
+  }
 };
 // 点击人员列表
-const clickPerson = (item:any) => {
-  console.log(item);
+const clickPerson =  async (item:any) => {
+  await getRecordList(item.hrGid)
 };
 //点击查询框
-const clickSearch = () => {
-  console.log(searchCode.value);
-  console.log(checkAttribute.value);
-  console.log(checkStatus.value);
-  
+const clickSearch = async() => {
+  console.log(queryData.value.key);
+  queryData.value.personAttributes = changeObject(checkAttribute.value)
+  queryData.value.recordState = changeObject(checkStatus.value)
+  await getSearchList(queryData.value)
 };
+//处理对象
+const changeObject = (val:object) => {
+  const values = Object.values(val)
+  const result = values.join(',')
+  return result
+}
+//上一页点击事件
+const chickUp = async() => {
+  if(queryData.value.current <= 1) {
+    return
+  }
+  queryData.value.current -= 1
+  await getSearchList(queryData.value)
+}
+//下一页点击事件
+const chickDown = async() => {
+  if(queryData.value.current >= Math.ceil(searchTotal.value / currentSize.value)) {
+    return
+  }
+  queryData.value.current += 1
+  await getSearchList(queryData.value)
+}
 </script>
 <template>
   <div class="health_content">
@@ -204,7 +206,7 @@ const clickSearch = () => {
       <div class="body_search">
         <div class="search_input">
           <el-input
-            v-model="searchCode"
+            v-model="queryData.key"
             size="small"
             placeholder="姓名/身份证号/档案号/自定义编号"
             style="width: 310px"
@@ -270,10 +272,10 @@ const clickSearch = () => {
       </div>
       <div class="body_table">
         <div class="table_result">
-          <p>查询结果：3487</p>
-          <p>当前数量：284</p>
+          <p>查询结果：{{  searchTotal || '暂无数据'}}</p>
+          <p>当前数量：{{ currentSize || '暂无数据'}}</p>
         </div>
-        <div class="table_card">
+        <div class="table_card" v-loading="false">
           <base-card-person
             v-model:showTooltip="showTooltip"
             @update:showTooltip="showTooltip = $event"
@@ -282,18 +284,18 @@ const clickSearch = () => {
           />
         </div>
         <div class="table_page">
-          <div class="page_up">上一页</div>
-          <div class="page_down">下一页</div>
+          <div class="page_up" @click="chickUp" :class="{ disabled: queryData.current <= 1 }">上一页</div>
+          <div class="page_down" @click="chickDown">下一页</div>
         </div>
       </div>
       <div class="body_content">
         <div class="content_title">
           <div class="image"></div>
           <p>档案管理</p>
-          <div class="title_status">正常</div>
+          <div class="title_status" v-if="Object.keys(formData).length > 0">{{  filterStatus(formData.recordState)}}</div>
         </div>
-        <el-scrollbar height="831px" v-if="!formData">
-          <base-person-message :formData="formData"/>
+        <el-scrollbar height="831px" >
+          <base-person-message :formData="formData" v-if="Object.keys(formData).length > 0"/>
         </el-scrollbar>
       </div>
     </div>
@@ -357,11 +359,11 @@ const clickSearch = () => {
           display: flex;
           flex-direction: column;
           width: 300px;
-          height: 157.99px;
+          /* height: 157.99px; */
           margin-bottom: 21px;
           .person_list {
             width: 299px;
-            height: 117.23px;
+            /* height: 117.23px; */
             margin-top: 17px;
           }
         }
@@ -369,18 +371,18 @@ const clickSearch = () => {
           display: flex;
           flex-direction: column;
           width: 300px;
-          height: 113.99px;
+          /* height: 113.99px; */
           margin-bottom: 20px;
           .record_status {
             width: 299px;
-            height: 74.62px;
+            /* height: 74.62px; */
             margin-top: 17px;
           }
         }
         .local_area {
           display: flex;
           flex-direction: column;
-          height: 240px;
+          height: 100px;
           width: 300px;
           margin-bottom: 12px;
           .area_list {
@@ -391,7 +393,7 @@ const clickSearch = () => {
               height: 26px;
             }
             :deep(.el-tree-node__children) {
-              height: 164px;
+              height: 26px;
               overflow: auto !important;
             }
             :deep(.el-tree-node__content > .el-tree-node__expand-icon) {
@@ -485,14 +487,14 @@ const clickSearch = () => {
       border-radius: 10px;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      /* justify-content: space-between; */
       align-items: center;
       margin-left: 10px;
       .table_result {
         display: flex;
         justify-content: space-around;
         width: 333px;
-        height: 50px;
+        height: 40px;
         font-size: 14px;
         font-family: SourceHanSansCN-Medium, SourceHanSansCN;
         font-weight: 500;
@@ -504,6 +506,7 @@ const clickSearch = () => {
         flex-direction: column;
         width: 340px;
         height: 750px;
+        margin-top: 3px;
       }
       .table_page {
         display: flex;
@@ -517,6 +520,12 @@ const clickSearch = () => {
         font-weight: 500;
         color: #2F7AFF;
         border-radius: 0px 0px 10px 10px;
+        margin-top: 50px;
+        .disabled {
+          pointer-events: none;
+          cursor:not-allowed !important;
+          background: #dce5e5;
+       }
         .page_up,
         .page_down {
           width: 170px;
