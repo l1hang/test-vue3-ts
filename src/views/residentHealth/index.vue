@@ -95,7 +95,9 @@ const queryData = ref({
 const checkAttribute = ref([]); //定义选中的人员属性
 const checkStatus = ref([]);  //定义选中的档案状态
 const showTooltip = ref(false); //定义鼠标移入移出事件
-const formData = ref({})
+const formData = ref({
+  recordState:'1'
+})
 const searchTotal = ref(0)
 const currentSize = ref(0)
 onMounted(() => {
@@ -159,6 +161,9 @@ const getRecordList = async (hrGid: string) => {
 };
 // 点击人员列表
 const clickPerson =  async (item:any) => {
+  formData.value = {
+  recordState:'1'
+}
   await getRecordList(item.hrGid)
 };
 //点击查询框
@@ -285,17 +290,17 @@ const chickDown = async() => {
         </div>
         <div class="table_page">
           <div class="page_up" @click="chickUp" :class="{ disabled: queryData.current <= 1 }">上一页</div>
-          <div class="page_down" @click="chickDown">下一页</div>
+          <div class="page_down" @click="chickDown" :class="{ disabled: cardPersonList.length <= 1 }">下一页</div>
         </div>
       </div>
       <div class="body_content">
         <div class="content_title">
           <div class="image"></div>
           <p>档案管理</p>
-          <div class="title_status" v-if="Object.keys(formData).length > 0">{{  filterStatus(formData.recordState)}}</div>
+          <div class="title_status" v-if="Object.keys(formData).length > 1">{{  filterStatus(formData.recordState)}}</div>
         </div>
         <el-scrollbar height="831px" >
-          <base-person-message :formData="formData" v-if="Object.keys(formData).length > 0"/>
+          <base-person-message :formData="formData" v-if="Object.keys(formData).length > 1"/>
         </el-scrollbar>
       </div>
     </div>
