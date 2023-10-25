@@ -1,15 +1,15 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
-import { requireAuth } from "./auth";
+import { useUserStore } from "@/store/user";
+import { ElMessage } from "element-plus";
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
-    redirect: "/home",
+    redirect: "/login",
   },
   {
     path: "/home",
     name: "home",
     component: () => import("@/layouts/layout/index.vue"),
-    // beforeEnter: requireAuth,
     children: [
       {
         path: "/residentHealth",
@@ -43,10 +43,22 @@ const router = createRouter({
   history: createWebHashHistory(),
   routes,
 });
+
+router.beforeEach((to, from, next) => {
+  // const userStore = useUserStore();
+  // const token = userStore.token;
+  const token = localStorage.getItem("token");
+  if (!token && to.path !== "/login") {
+    ElMessage({
+      message: "登录信息有误，请先登录",
+      type: "error",
+    });
+    next("/login");
+  } else if (to.path === "/login" && token) {
+    next("/home");
+  } else {
+    next();
+  }
+});
+
 export default router;
-// function login() {
-//   // 登录成功后将用户的登录状态保存到 localStorage 中
-//   localStorage.setItem('isAuthenticated', 'true')
-//   // 跳转到首页
-//   router.push('/home')
-// }

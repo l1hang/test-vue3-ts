@@ -1,14 +1,23 @@
 //定义接口返回数据类型
 export interface ResponseData <T = any> {
     code: number;
-    message: string;
+    msg: string;
     data: T;
 }
-//定义token
-const token = 'eyJhbGciOiJIUzUxMiJ9.eyJ5aGlkIjoxLCJqZ21jIjoi5YWw5bee5biC5Y2r55Sf5YGl5bq35aeU5ZGY5LyaIiwicXhxaGRtIjoiNjIwMTAyIiwieWh6aCI6ImFkbWluIiwiamdkbSI6Ijc0NTg3MjY5OCIsInVzZXJfa2V5IjoiNzlmNjI1NzUtOGFjMy00MDlhLWI0OWItZmViYjkyNDMyMmJmIiwiamdpZCI6MiwieWh4bSI6Iui2hee6p-euoeeQhuWRmCIsInN6cWhkbSI6IjYyMDEwMCJ9.AtWC5eOVjS6jA403t4Qd1ucf02odUWDJQyMdOvGAgom2hEOOtFA3a0_laNzntBZVmUMTUf2doXS8t6cvVtGHDQ'
+const token = localStorage.getItem("token");
 //获取验证码
-//登录后获取token
-export async function getToken(yhzh: string, password: string,code:string,uuid:string): Promise<ResponseData> {
+export async function getCode() {
+    const response = await fetch(`/api/code`,{
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+    const responseData = await response.json()
+    return responseData
+}
+//登录
+export async function getLogin(yhzh: string, password: string,code:string,uuid:string): Promise<ResponseData> {
     const response = await fetch(`/api/auth/login`,{
         method: 'POST',
         headers: {

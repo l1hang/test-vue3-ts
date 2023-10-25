@@ -3,6 +3,7 @@ import { defineConfig ,loadEnv } from 'vite'  //lodEnv 用于加载环境变量
 import vue from '@vitejs/plugin-vue'
 
 import sass from 'sass'
+import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 
@@ -20,8 +21,11 @@ export default defineConfig(({mode}) => {
     },
     plugins:[
       vue(),
+      AutoImport({
+        resolvers: [ElementPlusResolver()],
+      }),
       Components({
-        resolvers:[ElementPlusResolver()]
+        resolvers: [ElementPlusResolver()],
       }),
       {
         name:'sass',

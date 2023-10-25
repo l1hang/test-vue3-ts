@@ -119,7 +119,7 @@ const handleMouseLeave = (item: any) => {
   .card_line {
     width: 10px;
     height: 100%;
-    background-image: url("@/assets/card_line.png");
+    background-image: url("@/assets/images/card_line.png");
     background-repeat: no-repeat;
     background-size: 100% 100%;
     visibility: hidden;
@@ -204,7 +204,7 @@ const handleMouseLeave = (item: any) => {
         .card_img {
           width: 13px;
           height: 11px;
-          background-image: url("@/assets/id_card.png");
+          background-image: url("@/assets/images/id_card.png");
           background-repeat: no-repeat;
           background-size: 100% 100%;
         }
@@ -217,7 +217,7 @@ const handleMouseLeave = (item: any) => {
         .home_img {
           width: 13px;
           height: 11px;
-          background-image: url("@/assets/local_home.png");
+          background-image: url("@/assets/images/local_home.png");
           background-repeat: no-repeat;
           background-size: 100% 100%;
         }

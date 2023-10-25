@@ -407,7 +407,7 @@ const chickDown = async() => {
             :deep(.el-tree-node__content > .el-tree-node__expand-icon) {
               width: 11px;
               height: 11px;
-              background-image: url("@/assets/fold.png");
+              background-image: url("@/assets/images/fold.png");
               background-repeat: no-repeat;
               background-size: 100% 100%;
             }
@@ -575,7 +575,7 @@ const chickDown = async() => {
       .no-data {
         width: 100%;
         height: 820px;
-        background-image: url('@/assets/empty_data.png');
+        background-image: url('@/assets/images/empty_data.png');
         background-repeat: no-repeat;
         background-position: center;
         background-size: 10% 15%;
@@ -589,7 +589,7 @@ const chickDown = async() => {
         .image {
           width: 21px;
           height: 16px;
-          background-image: url("@/assets/record_manage.png");
+          background-image: url("@/assets/images/record_manage.png");
           background-repeat: no-repeat;
           background-size: 100% 100%;
           margin-left: 12px;
