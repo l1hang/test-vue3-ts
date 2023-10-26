@@ -292,7 +292,7 @@ const chickDown = async() => {
         </div>
         <div class="table_page">
           <div class="page_up" @click="chickUp" :class="{ disabled: queryData.current <= 1 }">上一页</div>
-          <div class="page_down" @click="chickDown" :class="{ disabled: cardPersonList.length <= 1 }">下一页</div>
+          <div class="page_down" @click="chickDown" :class="{ disabled: cardPersonList.length <= 10 }">下一页</div>
         </div>
       </div>
       <div class="body_content">
